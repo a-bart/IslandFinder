@@ -1,0 +1,17 @@
+.block {
+  flex-grow: 1;
+  margin: 1px;
+  min-height: 15px;
+  cursor: pointer;
+  border-radius: 3px;
+  border: 1px solid #5c5c5c;
+  transition: background-color 0.4s;
+
+  &.plain {
+    background-color: #ffffff;
+  }
+
+  &.island {
+    background-color: #90a897;
+  }
+}

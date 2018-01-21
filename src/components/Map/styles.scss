@@ -1,0 +1,25 @@
+.map {
+  display: inline-flex;
+  flex-direction: column;
+
+  .mapArea {
+    flex-grow: 2;
+
+    &.hidden {
+      display: none;
+    }
+
+    &.show {
+      display: block;
+    }
+
+    .row {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .stats {
+      margin: 20px 0;
+    }
+  }
+}

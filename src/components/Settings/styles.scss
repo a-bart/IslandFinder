@@ -1,0 +1,36 @@
+.settings {
+  .form {
+    font-size: 18px;
+
+    .form-element {
+      margin-bottom: 20px;
+
+      &.one-line {
+        display: inline-flex;
+
+        span {
+          margin-right: 10px;
+        }
+      }
+
+      .element-title {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .sizes {
+        display: flex;
+
+        & > div {
+          display: inline-flex;
+          align-items: baseline;
+          width: 50%;
+
+          span {
+            margin-right: 10px;
+          }
+        }
+      }
+    }
+  }
+}
