@@ -48,7 +48,7 @@ class Settings extends Component {
     const {
       rows, cols, fillRandomly, animation, animationSpeed,
       setRows, setCols, changeFillRandomly, changeAnimation, changeAnimationSpeed,
-      generateMap
+      generateMap, isFinding
     } = this.props;
 
     return (
@@ -67,7 +67,7 @@ class Settings extends Component {
                     setCols(e.target.value);
                     this.checkDimension('cols' ,e.target.value);
                   }}
-                  min={1}
+                  min={2}
                   type="number"
                   errorText={this.state.errors.cols}
                 />
@@ -82,7 +82,7 @@ class Settings extends Component {
                     setRows(e.target.value);
                     this.checkDimension('rows' ,e.target.value)
                   }}
-                  min={1}
+                  min={2}
                   type="number"
                   errorText={this.state.errors.rows}
                 />
@@ -118,7 +118,9 @@ class Settings extends Component {
                 changeAnimation(!animation);
 
                 if (!isInputChecked) {
-                  changeAnimationSpeed(1);
+                  changeAnimationSpeed(50);
+                } else {
+                  changeAnimationSpeed(525);
                 }
               }}
             />
@@ -126,11 +128,14 @@ class Settings extends Component {
           <div className="form-element">
             <span className="element-title">Скорость поиска</span>
             <Slider
-              min={1}
-              max={100}
+              min={50}
+              max={1000}
               step={1}
               disabled={!animation}
               value={animationSpeed}
+              onChange={(event, newValue) => {
+                changeAnimationSpeed(newValue)
+              }}
               sliderStyle={{
                 marginTop: 10,
                 marginBottom: 0
@@ -141,6 +146,7 @@ class Settings extends Component {
             label="Сгенерировать"
             backgroundColor="#fedd61"
             fullWidth
+            disabled={isFinding}
             onClick={() => {
               this.checkDimension('rows', rows);
               this.checkDimension('cols', cols);

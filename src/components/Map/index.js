@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 import './styles.css';
 
 import Block from '../Block';
@@ -8,35 +9,68 @@ import IslandFinder from '../../lib/islandFinder';
 class Map extends Component {
   constructor() {
     super();
-    this.state = {
-      isFinding: false,
-      foundIslands: [],
-    }
   }
 
-  find = (map) => {
-    console.log('начать поиск');
+  find = async (map) => {
+    const delay = this.props.animation ? this.props.duration : 0;
+    const islandFinder = new IslandFinder(map, delay);
 
-    const inslandFinder = new IslandFinder(map);
+    this.props.setFinding(true);
 
-    this.setState({
-      isFinding: true,
-    });
+    if (this.props.animation) {
+      this.checkFinder(islandFinder);
+    }
+    await islandFinder.find();
 
-    this.state.foundIslands = inslandFinder.islands;
+    this.props.setFinding(false);
+    this.props.setFinished(true);
 
-    inslandFinder.find();
+    if (!this.props.animation) {
+      this.props.setFinder(islandFinder.islands, islandFinder.currentPosition);
+    }
+  };
 
-    console.log('Острова: ', this.state.foundIslands);
+  checkFinder = (islandFinder) => {
+    const interval = setInterval(() => {
+      if (!this.props.isFinding) {
+        clearInterval(interval);
+      }
 
-    this.setState({
-      isFinding: false
-    });
+      this.props.setFinder(islandFinder.islands, islandFinder.currentPosition)
+    }, 50)
+  };
+
+  getIslandEnding = (countString) => {
+    if (countString.length === 2 && +countString[0] === 1) {
+      return 'ов';
+    }
+
+    if (+countString[countString.length-1] === 1) {
+      return '';
+    } else if (+countString[countString.length-1] >= 2 && +countString[countString.length-1] <= 4) {
+      return 'а';
+    } else {
+      return 'ов';
+    }
+  };
+
+  renderResult = () => {
+    const count = this.props.foundIslands.length;
+    const countString = count.toString();
+
+    if (count === 0) {
+      return 'Островов на карте нет'
+    }
+
+    const ending = this.getIslandEnding(countString);
+
+    return `Найден${countString[countString.length-1] === 1 ? '' : 'о'} ${count} остров${ending}`;
   };
 
   render() {
     const {
-      map, changeBlock
+      map, changeBlock, isFinding, foundIslands, currentPosition,
+      animation, finished
     } = this.props;
 
     return (
@@ -52,6 +86,10 @@ class Map extends Component {
                   x={blockIndex}
                   y={rowIndex}
                   changeBlock={changeBlock}
+                  currentPosition={currentPosition}
+                  foundIslands={foundIslands}
+                  isFinding={isFinding}
+                  animation={animation}
                 />
               })}
             </div>)
@@ -61,11 +99,19 @@ class Map extends Component {
               label="Найти острова"
               backgroundColor="#fedd61"
               fullWidth
-              disabled={this.state.isFinding}
+              disabled={isFinding}
               onClick={async () => {
                 await this.find(map);
               }}
             />
+            <div>
+              <Snackbar
+                open={finished}
+                message={this.renderResult()}
+                autoHideDuration={4000}
+                // onRequestClose={this.handleRequestClose}
+              />
+            </div>
           </div>
         </div>
       </div>

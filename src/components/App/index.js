@@ -10,15 +10,19 @@ class App extends Component {
     super();
     this.state = {
       map: null,
-      block: {
-        size: 0
-      },
       settings: {
         rows: '',
         cols: '',
         fillRandomly: false,
         animation: false,
-        animationSpeed: 1
+        animationSpeed: 50,
+        duration: 1000
+      },
+      isFinding: false,
+      finder: {
+        foundIslands: [],
+        currentPosition: [0,0],
+        finished: false
       }
     };
   }
@@ -63,7 +67,18 @@ class App extends Component {
     this.setState(prevState => ({
       settings: {
         ...prevState.settings,
-        animationSpeed
+        animationSpeed,
+        duration: 1050 - animationSpeed
+      }
+    }));
+  };
+
+  setFinder = (islands, position) => {
+    this.setState(prevState => ({
+      finder: {
+        ...prevState.finder,
+        foundIslands: islands,
+        currentPosition: position
       }
     }));
   };
@@ -91,7 +106,14 @@ class App extends Component {
       }
       map.push(arr);
 
-      this.setState({ map });
+      this.setState({
+        map,
+        finder: {
+          foundIslands: [],
+          currentPosition: [0,0],
+          finished: false
+        }
+      });
     }
   };
 
@@ -101,15 +123,40 @@ class App extends Component {
     console.log(`y: ${y}`);
     let map = [...this.state.map];
     map[y][x] = currentValue === 0 ? 1 : 0;
-    this.setState({ map });
+
+    this.setState(prevState => ({
+      map,
+      finder: {
+        ...prevState.finder,
+        finished: false
+      }
+    }));
+  };
+
+  setFinding = (finding) => {
+    this.setState({
+      isFinding: finding
+    })
+  };
+
+  setFinished = (status) => {
+    this.setState(prevState => ({
+      finder: {
+        ...prevState.finder,
+        finished: status
+      }
+    }));
   };
 
   render() {
     const {
       settings: {
-        rows, cols, fillRandomly, animation, animationSpeed
+        rows, cols, fillRandomly, animation, animationSpeed, duration
       },
-      map, block
+      map, isFinding,
+      finder: {
+        foundIslands, currentPosition, finished
+      }
     } = this.state;
     return (
       <div className='app'>
@@ -125,10 +172,20 @@ class App extends Component {
           changeAnimation={this.changeAnimation}
           changeAnimationSpeed={this.changeAnimationSpeed}
           generateMap={this.generateMap}
+          isFinding={isFinding}
         />
         <Map
           map={map}
           changeBlock={this.changeBlock}
+          isFinding={isFinding}
+          setFinding={this.setFinding}
+          animation={animation}
+          duration={duration}
+          setFinder={this.setFinder}
+          foundIslands={foundIslands}
+          currentPosition={currentPosition}
+          finished={finished}
+          setFinished={this.setFinished}
         />
       </div>
     );
