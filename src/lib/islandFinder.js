@@ -51,8 +51,57 @@ export default class IslandFinder {
     return false;
   }
 
-  // проверяем правый, нижний (если попали с найденного острова - то и левый) элемент
   checkNode(x, y, islandIndex) {
+    console.log(`текущая позиция: ${x} ${y}`);
+    this.currentPosition = [x, y];
+
+    let newIslandIndex = null;
+    let index = null;
+
+    if (this.checkIfNodeIsInIsland(x, y)) {
+      // console.log(`Элемент уже находится в острове. пропускаем... [${x}][${y}]`);
+      return;
+    }
+
+    // проверяем сам элемент
+    if (this.matrix[x][y] === 1) {
+      // console.log(`Нашли часть острова или остров. Элемент [${x}][${y}]`);
+
+      if (islandIndex !== undefined) {
+        this.islands[islandIndex].push([x, y]);
+      } else {
+        this.islands.push([[x, y]]);
+        newIslandIndex = this.islands.length - 1;
+
+        // console.log('Новый остров создан. ', this.islands);
+      }
+
+      index = islandIndex === undefined ? newIslandIndex : islandIndex;
+
+      // проверяем правый, если не уперлись в правый бок карты
+      if (y < this.matrix[0].length - 1) {
+        this.checkNode(x, y+1, index)
+      }
+
+      // проверяем левый, если не уперлись в левый бок карты
+      // и передан текущий остров
+      if (islandIndex && y > 0) {
+        this.checkNode(x, y-1, index)
+      }
+
+      // проверяем нижний, если не уперлись в низ карты
+      if (x < this.matrix.length - 1) {
+        this.checkNode(x+1, y, index)
+      }
+    }
+  }
+
+  // проверяем правый, нижний (если попали с найденного острова - то и левый) элемент
+  checkNodeAsync(x, y, islandIndex) {
+    if (this.stopped) {
+      throw new Error('stopped');
+    }
+
     // добавляем элемент чтобы следить за текущей позицией
     console.log(`текущая позиция: ${x} ${y}`);
     this.currentPosition = [x, y];
@@ -60,7 +109,7 @@ export default class IslandFinder {
     let newIslandIndex = null;
     let index = null;
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (this.checkIfNodeIsInIsland(x, y)) {
         // console.log(`Элемент уже находится в острове. пропускаем... [${x}][${y}]`);
         return resolve();
@@ -82,20 +131,24 @@ export default class IslandFinder {
 
           index = islandIndex === undefined ? newIslandIndex : islandIndex;
 
-          // проверяем правый, если не уперлись в правый бок карты
-          if (y < this.matrix[0].length - 1) {
-            await this.checkNode(x, y+1, index)
-          }
+          try {
+            // проверяем правый, если не уперлись в правый бок карты
+            if (y < this.matrix[0].length - 1) {
+              await this.checkNodeAsync(x, y+1, index)
+            }
 
-          // проверяем левый, если не уперлись в левый бок карты
-          // и передан текущий остров
-          if (islandIndex && y > 0) {
-            await this.checkNode(x, y-1, index)
-          }
+            // проверяем левый, если не уперлись в левый бок карты
+            // и передан текущий остров
+            if (islandIndex && y > 0) {
+              await this.checkNodeAsync(x, y-1, index)
+            }
 
-          // проверяем нижний, если не уперлись в низ карты
-          if (x < this.matrix.length - 1) {
-            await this.checkNode(x+1, y, index)
+            // проверяем нижний, если не уперлись в низ карты
+            if (x < this.matrix.length - 1) {
+              await this.checkNodeAsync(x+1, y, index)
+            }
+          } catch (err) {
+            reject(err);
           }
         }
         resolve()
@@ -103,12 +156,30 @@ export default class IslandFinder {
     });
   }
 
-  async find() {
+  find() {
     // проверка карты
     this.validateMap();
 
-    await Promise.each(this.matrix, async (row, x) => {
-      await Promise.each(this.matrix[x], async (element, y) => this.checkNode(x, y));
-    });
+    this.matrix.forEach((row, x) => {
+      this.matrix[x].forEach((element, y) => this.checkNode(x, y))
+    })
+  }
+
+  async findAsync() {
+    // проверка карты
+    this.validateMap();
+
+    try {
+      await Promise.each(this.matrix, async (row, x) => {
+        await Promise.each(this.matrix[x], async (element, y) => this.checkNodeAsync(x, y));
+      });
+    } catch (err) {
+      console.log('err: ', err.message);
+      throw err;
+    }
+  }
+
+  stop() {
+    this.stopped = true;
   }
 }
