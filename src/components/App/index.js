@@ -73,6 +73,16 @@ class App extends Component {
     }));
   };
 
+  resetFinder = () => {
+    this.setState({
+      finder: {
+        foundIslands: [],
+        currentPosition: [0,0],
+        finished: false
+      }
+    });
+  };
+
   setFinder = (islands, position) => {
     this.setState(prevState => ({
       finder: {
@@ -107,13 +117,9 @@ class App extends Component {
       map.push(arr);
 
       this.setState({
-        map,
-        finder: {
-          foundIslands: [],
-          currentPosition: [0,0],
-          finished: false
-        }
+        map
       });
+      this.resetFinder();
     }
   };
 
@@ -186,6 +192,7 @@ class App extends Component {
           currentPosition={currentPosition}
           finished={finished}
           setFinished={this.setFinished}
+          resetFinder={this.resetFinder}
         />
       </div>
     );

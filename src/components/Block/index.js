@@ -3,11 +3,26 @@ import classNames from 'classnames';
 import './styles.css';
 
 class Block extends Component {
+  constructor() {
+    super();
+    this.state = {
+      clicked: false
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isFinding === true) {
+      this.setState({
+        clicked: false
+      })
+    }
+  }
+
   render() {
     const {
       block, x, y, changeBlock,
       isFinding, currentPosition, foundIslands,
-      animation
+      animation, finished
     } = this.props;
 
     const current = animation && isFinding && x === currentPosition[1] && y === currentPosition[0];
@@ -18,7 +33,7 @@ class Block extends Component {
     const blockClass = classNames({
       'block': true,
       'current': current,
-      'foundPart': !current && coveredIslandPart,
+      'foundPart': !current && !this.state.clicked && coveredIslandPart,
       'plain': !(current && coveredIslandPart) && block === 0,
       'island': !(current && coveredIslandPart) && block === 1
     });
@@ -26,7 +41,15 @@ class Block extends Component {
     return (
       <div
         className={blockClass}
-        onClick={() => {changeBlock(block, x, y)}}
+        onClick={() => {
+          if (!isFinding) {
+            changeBlock(block, x, y);
+
+            this.setState({
+              clicked: true
+            })
+          }
+        }}
       />
     )
   }

@@ -15,6 +15,7 @@ class Map extends Component {
     const delay = this.props.animation ? this.props.duration : 0;
     const islandFinder = new IslandFinder(map, delay);
 
+    this.props.resetFinder();
     this.props.setFinding(true);
 
     if (this.props.animation) {
@@ -90,6 +91,7 @@ class Map extends Component {
                   foundIslands={foundIslands}
                   isFinding={isFinding}
                   animation={animation}
+                  finished={finished}
                 />
               })}
             </div>)
