@@ -9,6 +9,9 @@ import IslandFinder from '../../lib/islandFinder';
 class Map extends Component {
   constructor() {
     super();
+    this.state = {
+      stopped: false
+    };
   }
 
   find = async (map) => {
@@ -20,20 +23,37 @@ class Map extends Component {
 
     if (this.props.animation) {
       this.checkFinder(islandFinder);
-    }
-    await islandFinder.find();
 
-    this.props.setFinding(false);
-    this.props.setFinished(true);
+      try {
+        await islandFinder.findAsync();
 
-    if (!this.props.animation) {
+        this.props.setFinding(false);
+        this.props.setFinished(true);
+      } catch (err) {
+        if (err.message === 'stopped') {
+          this.props.resetFinder();
+          this.props.setFinding(false);
+          this.setState({ stopped :false });
+        } else {
+          throw err
+        }
+      }
+    } else {
+      islandFinder.find();
       this.props.setFinder(islandFinder.islands, islandFinder.currentPosition);
+      this.props.setFinding(false);
+      this.props.setFinished(true);
     }
   };
 
   checkFinder = (islandFinder) => {
     const interval = setInterval(() => {
       if (!this.props.isFinding) {
+        clearInterval(interval);
+      }
+
+      if (this.state.stopped) {
+        islandFinder.stop();
         clearInterval(interval);
       }
 
@@ -97,15 +117,32 @@ class Map extends Component {
             </div>)
           })}
           <div className="stats">
-            <RaisedButton
-              label="Найти острова"
-              backgroundColor="#fedd61"
-              fullWidth
-              disabled={isFinding}
-              onClick={async () => {
-                await this.find(map);
-              }}
-            />
+            {!isFinding && (
+              <RaisedButton
+                label="Найти острова"
+                backgroundColor="#fedd61"
+                fullWidth
+                disabled={isFinding}
+                onClick={async () => {
+                  await this.find(map);
+                }}
+              />
+            )}
+            {isFinding && (
+              <RaisedButton
+                label="Остановить"
+                backgroundColor="#FF6464"
+                fullWidth
+                disabled={!isFinding}
+                onClick={() => {
+                  console.log('stop button clicked');
+                  this.setState({
+                    stopped: true
+                  });
+                }}
+              />
+            )}
+
             <div>
               <Snackbar
                 open={finished}
