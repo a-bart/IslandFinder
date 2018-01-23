@@ -64,7 +64,7 @@ class Map extends Component {
 
     const ending = this.getIslandEnding(countString);
 
-    return `Найден${countString[countString.length-1] === 1 ? '' : 'о'} ${count} остров${ending}`;
+    return `Найден${+countString[countString.length-1] === 1 ? '' : 'о'} ${count} остров${ending}`;
   };
 
   render() {
