@@ -22,7 +22,8 @@ class App extends Component {
       finder: {
         foundIslands: [],
         currentPosition: [0,0],
-        finished: false
+        finished: false,
+        resultShowed: false
       }
     };
   }
@@ -154,6 +155,15 @@ class App extends Component {
     }));
   };
 
+  setResultShowed = (status) => {
+    this.setState(prevState => ({
+      finder: {
+        ...prevState.finder,
+        resultShowed: status
+      }
+    }));
+  };
+
   render() {
     const {
       settings: {
@@ -161,7 +171,7 @@ class App extends Component {
       },
       map, isFinding,
       finder: {
-        foundIslands, currentPosition, finished
+        foundIslands, currentPosition, finished, resultShowed
       }
     } = this.state;
     return (
@@ -191,7 +201,9 @@ class App extends Component {
           foundIslands={foundIslands}
           currentPosition={currentPosition}
           finished={finished}
+          resultShowed={resultShowed}
           setFinished={this.setFinished}
+          setResultShowed={this.setResultShowed}
           resetFinder={this.resetFinder}
         />
       </div>

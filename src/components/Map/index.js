@@ -61,17 +61,25 @@ class Map extends Component {
     }, 50)
   };
 
-  getIslandEnding = (countString) => {
+  getWords = (countString) => {
+    const words = ['Найден', 'остров'];
+
     if (countString.length === 2 && +countString[0] === 1) {
-      return 'ов';
+      words[0] += 'о';
+      words[1] += 'ов';
+      return words;
     }
 
     if (+countString[countString.length-1] === 1) {
-      return '';
+      return words;
     } else if (+countString[countString.length-1] >= 2 && +countString[countString.length-1] <= 4) {
-      return 'а';
+      words[0] += 'о';
+      words[1] += 'а';
+      return words;
     } else {
-      return 'ов';
+      words[0] += 'о';
+      words[1] += 'ов';
+      return words;
     }
   };
 
@@ -83,15 +91,15 @@ class Map extends Component {
       return 'Островов на карте нет'
     }
 
-    const ending = this.getIslandEnding(countString);
+    const words = this.getWords(countString);
 
-    return `Найден${+countString[countString.length-1] === 1 ? '' : 'о'} ${count} остров${ending}`;
+    return `${words[0]} ${count} ${words[1]}`;
   };
 
   render() {
     const {
       map, changeBlock, isFinding, foundIslands, currentPosition,
-      animation, finished
+      animation, finished, resultShowed, setResultShowed
     } = this.props;
 
     return (
@@ -145,10 +153,10 @@ class Map extends Component {
 
             <div>
               <Snackbar
-                open={finished}
+                open={finished && !resultShowed}
                 message={this.renderResult()}
                 autoHideDuration={4000}
-                // onRequestClose={this.handleRequestClose}
+                onRequestClose={() => {setResultShowed(true)}}
               />
             </div>
           </div>
