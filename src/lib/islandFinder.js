@@ -85,7 +85,7 @@ export default class IslandFinder {
 
       // проверяем левый, если не уперлись в левый бок карты
       // и передан текущий остров
-      if (islandIndex && y > 0) {
+      if (islandIndex !== undefined  && y > 0) {
         this.checkNode(x, y-1, index)
       }
 
@@ -139,7 +139,7 @@ export default class IslandFinder {
 
             // проверяем левый, если не уперлись в левый бок карты
             // и передан текущий остров
-            if (islandIndex && y > 0) {
+            if (islandIndex !== undefined && y > 0) {
               await this.checkNodeAsync(x, y-1, index)
             }
 
