@@ -22,3 +22,5 @@ yarn-error.log*
 
 # sass
 src/**/*.css
+
+.idea
