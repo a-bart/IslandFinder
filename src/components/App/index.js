@@ -141,9 +141,11 @@ class App extends Component {
   };
 
   setFinding = (finding) => {
-    this.setState({
-      isFinding: finding
-    })
+    return new Promise(resolve => {
+      this.setState({
+        isFinding: finding
+      }, resolve);
+    });
   };
 
   setFinished = (status) => {

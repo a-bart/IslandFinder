@@ -19,7 +19,7 @@ class Map extends Component {
     const islandFinder = new IslandFinder(map, delay);
 
     this.props.resetFinder();
-    this.props.setFinding(true);
+    await this.props.setFinding(true);
 
     if (this.props.animation) {
       this.checkFinder(islandFinder);
@@ -27,12 +27,12 @@ class Map extends Component {
       try {
         await islandFinder.findAsync();
 
-        this.props.setFinding(false);
+        await this.props.setFinding(false);
         this.props.setFinished(true);
       } catch (err) {
         if (err.message === 'stopped') {
           this.props.resetFinder();
-          this.props.setFinding(false);
+          await this.props.setFinding(false);
           this.setState({ stopped :false });
         } else {
           throw err
@@ -41,7 +41,7 @@ class Map extends Component {
     } else {
       islandFinder.find();
       this.props.setFinder(islandFinder.islands, islandFinder.currentPosition);
-      this.props.setFinding(false);
+      await this.props.setFinding(false);
       this.props.setFinished(true);
     }
   };
