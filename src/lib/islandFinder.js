@@ -5,6 +5,7 @@ export default class IslandFinder {
     this.matrix = matrix;
     this.islands = [];
     this.currentPosition = [];
+    this.checked = [];
     this.findingDelay = delay;
     this.stopped = false;
   }
@@ -63,28 +64,29 @@ export default class IslandFinder {
    * @param {number} islandIndex - индекс найденного острова
    */
   checkNode(x, y, islandIndex) {
+    // Если элемент уже проверялся, пропускаем...
+    if (this.checked.some(el => el[0] === x && el[1] === y)) {
+      return;
+    }
+
     console.log(`текущая позиция: ${x} ${y}`);
     this.currentPosition = [x, y];
 
     let newIslandIndex = null;
     let index = null;
 
+    // Если элемент уже находится в острове. пропускаем...
     if (this.checkIfNodeIsInIsland(x, y)) {
-      // console.log(`Элемент уже находится в острове. пропускаем... [${x}][${y}]`);
       return;
     }
 
     // проверяем сам элемент
     if (this.matrix[x][y] === 1) {
-      // console.log(`Нашли часть острова или остров. Элемент [${x}][${y}]`);
-
       if (islandIndex !== undefined) {
         this.islands[islandIndex].push([x, y]);
       } else {
         this.islands.push([[x, y]]);
         newIslandIndex = this.islands.length - 1;
-
-        // console.log('Новый остров создан. ', this.islands);
       }
 
       index = islandIndex === undefined ? newIslandIndex : islandIndex;
@@ -112,6 +114,8 @@ export default class IslandFinder {
         this.checkNode(x-1, y, index)
       }
     }
+
+    this.checked.push([x, y]);
   }
 
   /**
@@ -126,6 +130,11 @@ export default class IslandFinder {
       throw new Error('stopped');
     }
 
+    // Если элемент уже проверялся, пропускаем...
+    if (this.checked.some(el => el[0] === x && el[1] === y)) {
+      return;
+    }
+
     // добавляем элемент чтобы следить за текущей позицией
     console.log(`текущая позиция: ${x} ${y}`);
     this.currentPosition = [x, y];
@@ -134,23 +143,19 @@ export default class IslandFinder {
     let index = null;
 
     return new Promise((resolve, reject) => {
+      // Если элемент уже находится в острове. пропускаем...
       if (this.checkIfNodeIsInIsland(x, y)) {
-        // console.log(`Элемент уже находится в острове. пропускаем... [${x}][${y}]`);
         return resolve();
       }
 
       setTimeout(async () => {
         // проверяем сам элемент
         if (this.matrix[x][y] === 1) {
-          // console.log(`Нашли часть острова или остров. Элемент [${x}][${y}]`);
-
           if (islandIndex !== undefined) {
             this.islands[islandIndex].push([x, y]);
           } else {
             this.islands.push([[x, y]]);
             newIslandIndex = this.islands.length - 1;
-
-            // console.log('Новый остров создан. ', this.islands);
           }
 
           index = islandIndex === undefined ? newIslandIndex : islandIndex;
@@ -182,6 +187,7 @@ export default class IslandFinder {
             reject(err);
           }
         }
+        this.checked.push([x, y]);
         resolve()
       }, this.findingDelay);
     });
@@ -205,7 +211,7 @@ export default class IslandFinder {
         await Promise.each(this.matrix[x], async (element, y) => this.checkNodeAsync(x, y));
       });
     } catch (err) {
-      console.log('err: ', err.message);
+      console.error('err: ', err.message);
       throw err;
     }
   }
