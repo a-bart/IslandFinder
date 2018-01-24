@@ -37,9 +37,14 @@ export default class IslandFinder {
     });
   }
 
-  // если уже есть хотя бы один найденный остров,
-  // проверяем переданный элемент на наличие в островах.
-  // Если элемент найден, пропускаем его проверку
+  /**
+   * Если уже есть хотя бы один найденный остров,
+   * проверяем переданный элемент на наличие в островах.
+   * Если элемент найден, пропускаем его проверку
+   * @param x
+   * @param y
+   * @returns {boolean}
+   */
   checkIfNodeIsInIsland(x, y) {
     const checkIslandElements = (islandIndex) => {
       return this.islands[islandIndex].some(el => el[0] === x && el[1] === y);
@@ -51,6 +56,12 @@ export default class IslandFinder {
     return false;
   }
 
+  /**
+   * Проверяем правый, нижний (если попали с найденного острова - то и левый, верхний) элементы
+   * @param {number} x
+   * @param {number} y
+   * @param {number} islandIndex - индекс найденного острова
+   */
   checkNode(x, y, islandIndex) {
     console.log(`текущая позиция: ${x} ${y}`);
     this.currentPosition = [x, y];
@@ -93,10 +104,23 @@ export default class IslandFinder {
       if (x < this.matrix.length - 1) {
         this.checkNode(x+1, y, index)
       }
+
+      // проверяем верхний, если не уперлись в верх карты,
+      // если передан текущий остров и текущий элемент смещен
+      // по горизонтали относительно первого элемента в острове
+      if (x > 0 && islandIndex !== undefined && this.islands[islandIndex][0][1] !== y) {
+        this.checkNode(x-1, y, index)
+      }
     }
   }
 
-  // проверяем правый, нижний (если попали с найденного острова - то и левый) элемент
+  /**
+   * Проверяем правый, нижний (если попали с найденного острова - то и левый, верхний) элементы.
+   * Метод используется при поиске с анимацией (с таймером)
+   * @param {number} x
+   * @param {number} y
+   * @param {number} islandIndex - индекс найденного острова
+   */
   checkNodeAsync(x, y, islandIndex) {
     if (this.stopped) {
       throw new Error('stopped');
@@ -146,6 +170,13 @@ export default class IslandFinder {
             // проверяем нижний, если не уперлись в низ карты
             if (x < this.matrix.length - 1) {
               await this.checkNodeAsync(x+1, y, index)
+            }
+
+            // проверяем верхний, если не уперлись в верх карты,
+            // если передан текущий остров и текущий элемент смещен
+            // по горизонтали относительно первого элемента в острове
+            if (x > 0 && islandIndex !== undefined && this.islands[islandIndex][0][1] !== y) {
+              await this.checkNodeAsync(x-1, y, index)
             }
           } catch (err) {
             reject(err);
