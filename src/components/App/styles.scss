@@ -1,8 +1,13 @@
 @import '../../styles/fonts.scss';
+@import '../../styles/screens.scss';
 
 .app {
   display: flex;
   height: 100vh;
+
+  @media screen and (max-width: $break-large) {
+    flex-direction: column;
+  }
 
   & > div {
     margin: 3%;
@@ -14,11 +19,19 @@
     }
 
     &:first-child {
-      width: 40%
+      width: 35%;
+
+      @media screen and (max-width: $break-large) {
+        width: inherit
+      }
     }
 
     &:last-child {
-      width: 60%
+      width: 65%;
+
+      @media screen and (max-width: $break-large) {
+        width: inherit
+      }
     }
   }
 }

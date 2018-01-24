@@ -58,9 +58,14 @@ class Settings extends Component {
           <div className="form-element">
             <div className="sizes">
               <div>
-                <span className="element-title">Ширина</span>
                 <TextField
                   id="1"
+                  floatingLabelText="Ширина"
+                  floatingLabelStyle={{
+                    fontSize: '18px',
+                    fontWeight: 700
+                  }}
+                  fullWidth
                   value={cols}
                   onInput={(e)=>{
                     e.target.value = Math.max(0, parseInt(e.target.value, 10) ).toString().slice(0,2);
@@ -73,9 +78,14 @@ class Settings extends Component {
                 />
               </div>
               <div>
-                <span className="element-title">Высота</span>
                 <TextField
                   id="2"
+                  floatingLabelText="Высота"
+                  floatingLabelStyle={{
+                    fontSize: '18px',
+                    fontWeight: 700
+                  }}
+                  fullWidth
                   value={rows}
                   onInput={(e)=>{
                     e.target.value = Math.max(0, parseInt(e.target.value, 10) ).toString().slice(0,2);
